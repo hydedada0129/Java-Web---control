@@ -1,0 +1,85 @@
+package www.bps.service;
+
+import java.util.List;
+
+import www.bps.entity.Product;
+import www.bps.entity.Spec;
+import www.bps.exception.VGBException;
+
+public class ProductService {
+	private ProductsDAO dao = new ProductsDAO();
+	
+	/**
+	 * 查詢全部產品
+	 * @return 查出全部產品的List
+	 * @throws VGBException 當資料庫發生重大錯誤
+	 */
+	public List<Product> getAllProducts() throws VGBException{
+		return dao.selectAllProducts();
+	}
+	 
+	/**
+	 * 依關鍵字查詢產品
+	 * @param keyword
+	 * @return 產品名稱中有出現關鍵字的產品List
+	 * @throws VGBException 當資料庫發生重大錯誤
+	 */
+	public List<Product> getProductsByKeyword(String keyword) throws VGBException{
+		if(keyword==null || keyword.length()==0)
+			throw new IllegalArgumentException("用[關鍵字查詢產品]時，必須輸入關鍵字");
+		
+		return dao.selectProductsByKeyword(keyword);
+	}
+	
+	/**
+	 * @param category
+	 * @return 查出符合分類的產品List
+	 * @throws VGBException
+	 */
+	public List<Product> getProductsByCategory(String category) throws VGBException{
+		if(category==null || category.length()==0)
+			throw new IllegalArgumentException("用[分類查詢產品]時，必須輸入category");
+		
+		return dao.selectProductsByCategory(category);
+	}
+	 
+	public List<Product> getNewestProducts() throws VGBException{
+		return dao.selectNewestProducts();
+	}
+	
+	/**
+	 * 查出指定代號的產品
+	 * @param id 產品代號
+	 * @return 符合代號的產品，否則null
+	 * @throws VGBException
+	 */
+	public Product getProductById(String id) throws VGBException{
+		return dao.selectProductById(id);
+	}
+	
+	
+	public List<Spec> getSpecList(String productId,String colorName) throws VGBException{
+		if(productId==null) throw new IllegalArgumentException("查詢產品[規格清單]時，productId不得為null");
+		if(colorName==null) colorName="";
+		return dao.selectSpecList(productId, colorName);
+	}
+
+	public Spec getSpecById(String productId, String colorName, String specName) throws VGBException {
+		if(specName==null) throw new IllegalArgumentException("查詢產品[規格]時，specName不得為null");
+		
+		List<Spec> list= this.getSpecList(productId, colorName);
+		Spec spec = null;
+		if(list!=null && list.size()>0) {
+			for(Spec s:list) {
+				if(specName.equals(s.getSpecName())) {
+					spec = s;
+					break;
+				}
+			}
+		}
+		return spec;
+	}
+	 
+}
+ 
+
